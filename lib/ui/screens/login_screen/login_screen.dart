@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../generated/assets.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
+import '../../components/snackBar.dart';
 import '../home_screen/home_screen.dart';
 import '../signup_screen/signup_screen.dart';
 
@@ -18,21 +19,6 @@ class LoginScreen extends StatefulWidget {
 
 
 class _LoginScreenState extends State<LoginScreen> {
-
-  void showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style:
-          const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: primaryColor,
-        // action: SnackBarAction(
-        //     label: 'Cancel', textColor: Colors.white, onPressed: () {}),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,12 +73,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         try {
                           String? validation = loginProvider.validation();
                           if (validation != null){
-                            showSnackBar(validation);
+                            BottomSnackbar().showSnackBar(context, validation);
                           }
                           else {
                             String? error = await loginProvider.login();
                             if(error == null){
-                              showSnackBar('Login Successfully');
+                              BottomSnackbar().showSnackBar(context,'Login Successfully');
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
@@ -100,12 +86,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                        HomeScreen()));
                             }
                             else {
-                              showSnackBar(error);
+                              BottomSnackbar().showSnackBar(context, error);
                             }
                           }
                         }
                             catch (e){
-                              showSnackBar(
+                              BottomSnackbar().showSnackBar(context,
                                   'An unexpected error occurred. Please try again.');
                               debugPrint(e as String?) ;
                             }

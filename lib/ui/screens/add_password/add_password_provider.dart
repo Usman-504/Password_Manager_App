@@ -15,6 +15,9 @@ class AddPasswordProvider with ChangeNotifier {
   String _imageUrl = '';
   String get imageUrl => _imageUrl;
 
+  String _imagePath = '';
+  String get imagePath => _imagePath;
+
   XFile? _file;
   XFile? get file => _file;
 
@@ -53,6 +56,7 @@ class AddPasswordProvider with ChangeNotifier {
         'Account Password': accountPasswordController.text.trim(),
         'user_id': currentUser!.uid,
         'image_url': _imageUrl,
+        'image_path': _imagePath,
       });
       print('Data saved successfully!');
     } else {
@@ -75,10 +79,28 @@ class AddPasswordProvider with ChangeNotifier {
       try {
         await imageToUpload.putFile(File(file!.path));
         _imageUrl = await imageToUpload.getDownloadURL();
+        _imagePath = imageToUpload.fullPath;
+        print(imageToUpload.fullPath);
+
         print('Image uploaded successfully, URL: $_imageUrl');
         notifyListeners();
       } catch (e) {
         print('Failed to upload image: $e');
+      }
+    }
+  }
+
+  void deleteImage(String docId) async {
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('Passwords')
+        .doc(docId)
+        .get();
+    if (doc.exists) {
+      String path = doc['images/${uniqueFileName}'];
+
+      if(path.isNotEmpty){
+        await FirebaseStorage.instance.ref().delete();
       }
     }
   }

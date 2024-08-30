@@ -15,11 +15,24 @@ class HomeProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  void deletePassword (String docId) {
-    FirebaseFirestore.instance
+  void deletePassword (String docId) async {
+
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+    DocumentSnapshot doc = await FirebaseFirestore.instance
         .collection('Passwords')
         .doc(docId)
-        .delete();
+        .get();
+    if (doc.exists) {
+      String path = doc.get('image_path');
+
+      if(path.isNotEmpty){
+        await FirebaseStorage.instance.ref(path).delete();
+      }
+      await FirebaseFirestore.instance
+          .collection('Passwords')
+          .doc(docId)
+          .delete();
+    }
 
   }
 
